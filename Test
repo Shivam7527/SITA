@@ -1,0 +1,38 @@
+Integrate our existing Python-based AI Log Viewer (FastAPI + existing UI) end-to-end into our existing Admin Application built with Java Spring Boot. Do not rewrite or migrate the Python application to Java. First inspect both codebases and understand their existing architecture, authentication, authorization, UI framework, routing, APIs, configuration, environment handling, database connectivity, MetIQ integration, logging and deployment approach. Then implement the integration with minimum changes to existing functionality.
+
+Add a new “Audit Logging” module in the existing Admin Application navigation, with “AI Log Viewer” as the page/sub-module. The user must access it through the existing Admin App login and must not have a second login. Reuse the existing Admin authentication, roles, permissions, header, sidebar, UI components and styling. Add an appropriate Audit Logging permission using the application’s existing authorization pattern.
+
+Keep the Python AI Log Viewer as a separate internal service and integrate it with the Java Spring Boot application through secure REST APIs. Create a clean Spring Boot integration layer using the HTTP client already used by the Admin App (Feign/WebClient/RestClient, whichever is already standard). The browser should communicate with the Admin App, and the Admin App should communicate with Python. Do not expose Python service URLs, MetIQ API keys or database credentials to the frontend.
+
+The target flow should be: User → Existing Admin Login → Audit Logging → AI Log Viewer → Spring Boot API → Python FastAPI → MetIQ → SQL validation/guardrails → selected environment DB → results → AI summary → Spring Boot → Admin UI.
+
+Reuse all existing AI Log Viewer functionality, including natural-language search, transaction search, API status, request/response details, quote/transaction information, AI-generated summary, filters, date/time search, copy/download functionality and CSV export. Do not duplicate existing APIs; reuse them where possible and add new APIs only where required.
+
+Support DEV, QA and PROD environment switching using the existing application’s configuration mechanism. Environment selection must be controlled and authorized on the backend. Never accept arbitrary DB connection information from the user. Map each environment to predefined secure configuration. Keep DB credentials and secrets in the existing enterprise secret/configuration mechanism.
+
+Keep the existing MetIQ integration in Python unless inspection shows a strong architectural reason otherwise. The MetIQ API key must remain server-side. Preserve and strengthen existing AI/SQL guardrails: allow read-only operations, block INSERT/UPDATE/DELETE/DROP/ALTER/TRUNCATE, validate generated SQL, restrict accessible tables/views, use read-only DB credentials, apply query timeout and result limits, and avoid unnecessary SELECT *. Never execute unvalidated AI-generated SQL.
+
+Add secure service-to-service authentication between Spring Boot and Python using the existing enterprise authentication standard if available, preferably OAuth2/Azure AD/service identity. Otherwise use a secure service credential mechanism already supported by the environment. Use HTTPS.
+
+Add proper error handling for Python service unavailable, MetIQ unavailable, database unavailable, timeout, invalid AI-generated SQL and authorization failures. Show user-friendly messages while never exposing stack traces, credentials, internal connection details or API keys.
+
+Add audit tracking for AI Log Viewer usage using the existing Admin audit/logging framework if available. Capture appropriate information such as user, timestamp, environment, search/query criteria, execution status, execution duration and record count, while avoiding sensitive secrets or unnecessary sensitive payloads.
+
+Add health checks for the Python service and, where appropriate, MetIQ/database connectivity. Add appropriate connection/read timeouts and resilience using existing project standards.
+
+Follow the existing project’s package structure, naming conventions, coding standards, UI patterns and security practices. Do not introduce unnecessary new frameworks or technologies. Do not modify unrelated Admin modules.
+
+Add complete unit, integration, security and end-to-end tests covering: Admin authentication, Audit Logging authorization, UI navigation, Spring Boot → Python communication, environment switching, MetIQ processing, SQL guardrails, database execution, successful search, empty result, timeout, service failure and unauthorized access.
+
+Finally, provide the implementation with:
+
+1. Final architecture/flow
+2. All files created or modified
+3. API contracts between Spring Boot and Python
+4. Required configuration/environment variables
+5. Authentication/authorization changes
+6. DEV/QA/PROD deployment changes
+7. Test cases and results
+8. Any assumptions or items that require confirmation
+
+Most importantly: keep the existing Java Admin App as the single user-facing application, keep the existing Python AI Log Viewer as the AI/backend service, reuse existing authentication and UI patterns, maintain DEV/QA/PROD separation, and do not break existing functionality.
